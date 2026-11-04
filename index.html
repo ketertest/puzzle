@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Movie!</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="error-banner" hidden></div>
+
+  <div id="app">
+    <section id="view-menu" class="view">
+      <h1>🎬 Guess the Movie!</h1>
+      <p class="subtitle">Pick a puzzle to start the next round</p>
+      <div id="puzzle-list"></div>
+      <p id="menu-empty" hidden>No puzzles found. Add a folder under <code>puzzles/</code> and list it in <code>manifest.json</code>.</p>
+    </section>
+
+    <section id="view-guess" class="view">
+      <h2 id="guess-title">Guess 1 of 3</h2>
+      <img id="guess-image" class="media-image" src="" alt="Movie snapshot">
+    </section>
+
+    <section id="view-audio" class="view">
+      <h2>🔊 Audio Hint</h2>
+      <p class="hint-text">Still stuck? Here's a listen...</p>
+      <audio id="audio-player" controls preload="auto"></audio>
+    </section>
+
+    <section id="view-video" class="view">
+      <h2>🎥 Video Hint</h2>
+      <p class="hint-text">One more clue before the big reveal...</p>
+      <video id="video-player" class="media-video" controls preload="auto"></video>
+    </section>
+
+    <section id="view-reveal" class="view">
+      <h2>🎉 The Answer Is...</h2>
+      <img id="reveal-image" class="media-image" src="" alt="Movie title card">
+    </section>
+
+    <section id="view-traits" class="view">
+      <h2>One Last Question 💭</h2>
+      <p class="traits-question">What traits would you like the baby to have&mdash;from this movie, or from one of its characters?</p>
+    </section>
+  </div>
+
+  <nav id="controls">
+    <button id="btn-back" class="ctrl-btn">⬅ Back</button>
+    <button id="btn-menu" class="ctrl-btn">🏠 Menu</button>
+    <button id="btn-skip" class="ctrl-btn">⏭ Skip to Reveal</button>
+    <button id="btn-next" class="ctrl-btn primary">Next ➡</button>
+    <button id="btn-finish" class="ctrl-btn primary">✅ Finish</button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
