@@ -6,7 +6,6 @@ const STATES = {
   AUDIO: 'AUDIO',
   VIDEO: 'VIDEO',
   REVEAL: 'REVEAL',
-  TRAITS: 'TRAITS',
 };
 
 const GUESS_STATES = [STATES.GUESS_0, STATES.GUESS_1, STATES.GUESS_2];
@@ -17,7 +16,6 @@ const NEXT_MAP = {
   [STATES.GUESS_2]: STATES.AUDIO,
   [STATES.AUDIO]: STATES.VIDEO,
   [STATES.VIDEO]: STATES.REVEAL,
-  [STATES.REVEAL]: STATES.TRAITS,
 };
 
 const BUTTONS = {
@@ -27,8 +25,7 @@ const BUTTONS = {
   [STATES.GUESS_2]: ['back', 'menu', 'skip', 'next'],
   [STATES.AUDIO]: ['back', 'menu', 'skip', 'next'],
   [STATES.VIDEO]: ['back', 'menu', 'skip', 'next'],
-  [STATES.REVEAL]: ['back', 'menu', 'next'],
-  [STATES.TRAITS]: ['back', 'menu', 'finish'],
+  [STATES.REVEAL]: ['back', 'menu', 'finish'],
 };
 
 const IMAGE_EXTENSIONS = ['jpeg', 'jpg', 'png'];
@@ -37,6 +34,17 @@ let manifest = [];
 let currentPuzzle = null;
 let currentState = STATES.MENU;
 let history = [];
+let hasAudio = true;
+let hasVideo = true;
+
+async function fileExists(url) {
+  try {
+    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
 
 // Tries each extension in IMAGE_EXTENSIONS in turn until one loads, since
 // puzzle images may be supplied as .jpeg, .jpg, or .png under the same name.
@@ -112,9 +120,30 @@ function loadPuzzle(folder) {
   video.src = base + 'video.mp4';
   video.load();
 
+  hasAudio = true;
+  hasVideo = true;
+  fileExists(base + 'audio.mp3').then((exists) => {
+    hasAudio = exists;
+  });
+  fileExists(base + 'video.mp4').then((exists) => {
+    hasVideo = exists;
+  });
+
   history = [];
   currentState = STATES.GUESS_0;
   render();
+}
+
+function getNextState(state) {
+  if (state === STATES.GUESS_2) {
+    if (hasAudio) return STATES.AUDIO;
+    if (hasVideo) return STATES.VIDEO;
+    return STATES.REVEAL;
+  }
+  if (state === STATES.AUDIO) {
+    return hasVideo ? STATES.VIDEO : STATES.REVEAL;
+  }
+  return NEXT_MAP[state];
 }
 
 function pauseMedia() {
@@ -157,7 +186,7 @@ function render() {
 }
 
 function goNext() {
-  const target = NEXT_MAP[currentState];
+  const target = getNextState(currentState);
   if (!target) return;
   history.push(currentState);
   currentState = target;
@@ -210,10 +239,10 @@ function wireErrorHandlers() {
   // guess-image and reveal-image failures are handled by setImageWithFallback's
   // onFail callback, after all extensions have been tried.
   document.getElementById('audio-player').addEventListener('error', () => {
-    showError('Could not load audio.mp3 for this puzzle.');
+    if (hasAudio) showError('Could not load audio.mp3 for this puzzle.');
   });
   document.getElementById('video-player').addEventListener('error', () => {
-    showError('Could not load video.mp4 for this puzzle.');
+    if (hasVideo) showError('Could not load video.mp4 for this puzzle.');
   });
 }
 
