@@ -82,6 +82,13 @@ async function init() {
   render();
 }
 
+function formatFolderName(folder) {
+  return folder
+    .split(/[-_]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 function renderMenu() {
   const list = document.getElementById('puzzle-list');
   const empty = document.getElementById('menu-empty');
@@ -91,10 +98,10 @@ function renderMenu() {
     return;
   }
   empty.hidden = true;
-  manifest.forEach((folder, i) => {
+  manifest.forEach((folder) => {
     const btn = document.createElement('button');
     btn.className = 'puzzle-btn';
-    btn.textContent = 'Puzzle ' + (i + 1);
+    btn.textContent = formatFolderName(folder);
     btn.addEventListener('click', () => loadPuzzle(folder));
     list.appendChild(btn);
   });
